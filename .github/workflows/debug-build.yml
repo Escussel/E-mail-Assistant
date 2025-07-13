@@ -1,82 +1,36 @@
-name: 📱 Build Debug APK v3 (Final Fix)
+name: 📱 Ultra Simple Debug APK
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
 
 jobs:
-  build-debug:
+  build:
     runs-on: ubuntu-latest
     
     steps:
-    - name: 📥 Checkout code
+    - name: 📥 Checkout
       uses: actions/checkout@v4
       
-    - name: ☕ Setup Java 17
+    - name: ☕ Setup Java
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         
-    - name: 🔧 Setup Android SDK
+    - name: 🔧 Setup Android
       uses: android-actions/setup-android@v3
-      with:
-        cmdline-tools-version: 11076708
-        accept-android-sdk-licenses: true
-        
-    - name: 📋 Cache Gradle dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: 🔑 Make gradlew executable
+      
+    - name: 🔑 Make executable
       run: chmod +x gradlew
       
-    - name: 🧹 Clean project
-      run: ./gradlew clean
+    - name: 🏗️ Build APK
+      run: ./gradlew assembleDebug
       
-    - name: 🏗️ Build Debug APK
-      run: |
-        echo "Building debug APK..."
-        ./gradlew assembleDebug --stacktrace
-        
-    - name: 📁 List APK files
-      run: |
-        echo "Listing all APK files:"
-        find . -name "*.apk" -type f
-        
-    - name: 📦 Upload Debug APK
+    - name: 📦 Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: EmailAssistant-Debug-APK-FINAL
-        path: app/build/outputs/apk/debug/*.apk
-        retention-days: 30
+        name: EmailAssistant-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
         
-    - name: 🎉 Success Message
-      run: |
-        echo "🎉 APK BUILD SUCCESSFUL!"
-        echo "📱 Your Email Assistant APK is ready!"
-        echo "📥 Download from: Actions > Artifacts"
-        echo ""
-        echo "✅ Features included:"
-        echo "   🎤 Voice recognition in Portuguese"
-        echo "   🧠 AI email analysis"
-        echo "   📧 Microsoft Outlook integration"
-        echo "   🗣️ Text-to-speech"
-        echo "   🚗 Hands-free mode for driving"
-        echo ""
-        echo "📱 Installation:"
-        echo "   1. Download the artifact ZIP"
-        echo "   2. Extract the APK file"
-        echo "   3. Transfer to your Android phone"
-        echo "   4. Enable 'Unknown sources' in settings"
-        echo "   5. Install the APK"
-        echo ""
-        echo "🎯 This is a DEBUG APK for testing"
-        echo "   Perfect for trying all features!"
+    - name: 🎉 Success
+      run: echo "APK ready for download!"
 
