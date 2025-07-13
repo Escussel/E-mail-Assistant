@@ -1,4 +1,4 @@
-name: 📱 Build Debug APK v2 (Guaranteed Success)
+name: 📱 Build Debug APK v3 (Final Fix)
 on:
   workflow_dispatch:
   push:
@@ -21,8 +21,8 @@ jobs:
     - name: 🔧 Setup Android SDK
       uses: android-actions/setup-android@v3
       with:
-        api-level: 34
-        build-tools: 34.0.0
+        cmdline-tools-version: 11076708
+        accept-android-sdk-licenses: true
         
     - name: 📋 Cache Gradle dependencies
       uses: actions/cache@v4
@@ -43,38 +43,40 @@ jobs:
     - name: 🏗️ Build Debug APK
       run: |
         echo "Building debug APK..."
-        ./gradlew assembleDebug --stacktrace --info
+        ./gradlew assembleDebug --stacktrace
         
     - name: 📁 List APK files
       run: |
         echo "Listing all APK files:"
         find . -name "*.apk" -type f
-        ls -la app/build/outputs/apk/debug/ || echo "Debug folder not found"
         
     - name: 📦 Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: EmailAssistant-Debug-APK-v2
-        path: |
-          app/build/outputs/apk/debug/*.apk
-          app/build/outputs/apk/**/*.apk
+        name: EmailAssistant-Debug-APK-FINAL
+        path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
-        if-no-files-found: warn
         
-    - name: 📋 Build Summary
+    - name: 🎉 Success Message
       run: |
-        echo "🎉 Build completed!"
-        echo "📱 APK Type: Debug (for testing)"
-        echo "📥 Download: Go to Actions > Artifacts"
-        echo "🔧 Install: Enable 'Unknown sources' on Android"
+        echo "🎉 APK BUILD SUCCESSFUL!"
+        echo "📱 Your Email Assistant APK is ready!"
+        echo "📥 Download from: Actions > Artifacts"
         echo ""
         echo "✅ Features included:"
-        echo "   - Voice recognition in Portuguese"
-        echo "   - AI email analysis"
-        echo "   - Microsoft Outlook integration"
-        echo "   - Text-to-speech"
-        echo "   - Hands-free mode"
+        echo "   🎤 Voice recognition in Portuguese"
+        echo "   🧠 AI email analysis"
+        echo "   📧 Microsoft Outlook integration"
+        echo "   🗣️ Text-to-speech"
+        echo "   🚗 Hands-free mode for driving"
         echo ""
-        echo "⚠️  Note: This is a DEBUG APK for testing"
-        echo "   For production APK, configure GitHub secrets"
+        echo "📱 Installation:"
+        echo "   1. Download the artifact ZIP"
+        echo "   2. Extract the APK file"
+        echo "   3. Transfer to your Android phone"
+        echo "   4. Enable 'Unknown sources' in settings"
+        echo "   5. Install the APK"
+        echo ""
+        echo "🎯 This is a DEBUG APK for testing"
+        echo "   Perfect for trying all features!"
 
