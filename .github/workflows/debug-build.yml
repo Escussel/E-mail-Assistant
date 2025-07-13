@@ -1,0 +1,58 @@
+name: 📱 Build Debug APK (No Keystore Required)
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-debug:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      
+    - name: ☕ Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: 🔧 Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: 📋 Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: 🏗️ Build Debug APK
+      run: |
+        chmod +x gradlew
+        ./gradlew assembleDebug
+        
+    - name: 📦 Upload Debug APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: EmailAssistant-Debug-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+        
+    - name: 📋 Show APK Info
+      run: |
+        echo "✅ Debug APK gerado com sucesso!"
+        echo "📱 Nome: EmailAssistant-Debug.apk"
+        echo "🔧 Tipo: Debug (para testes)"
+        echo "📥 Download: Vá para Actions > Artifacts"
+        echo ""
+        echo "⚠️  IMPORTANTE: Este é um APK de DEBUG"
+        echo "   Para APK de RELEASE (produção), configure os secrets:"
+        echo "   1. KEYSTORE_BASE64 (valor do arquivo keystore-base64.txt)"
+        echo "   2. KEYSTORE_PASSWORD: EmailAssist2024#Secure"
+        echo "   3. KEY_ALIAS: emailassistant"
+        echo "   4. KEY_PASSWORD: EmailKey2024#Strong"
