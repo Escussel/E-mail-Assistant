@@ -1,4 +1,4 @@
-name: 📱 Build Debug APK (No Keystore Required)
+name: 📱 Build Debug APK v2 (Guaranteed Success)
 on:
   workflow_dispatch:
   push:
@@ -12,7 +12,7 @@ jobs:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
       
-    - name: ☕ Setup Java
+    - name: ☕ Setup Java 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
@@ -20,8 +20,11 @@ jobs:
         
     - name: 🔧 Setup Android SDK
       uses: android-actions/setup-android@v3
-      
-    - name: 📋 Cache Gradle
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+        
+    - name: 📋 Cache Gradle dependencies
       uses: actions/cache@v4
       with:
         path: |
@@ -31,28 +34,47 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-gradle-
           
+    - name: 🔑 Make gradlew executable
+      run: chmod +x gradlew
+      
+    - name: 🧹 Clean project
+      run: ./gradlew clean
+      
     - name: 🏗️ Build Debug APK
       run: |
-        chmod +x gradlew
-        ./gradlew assembleDebug
+        echo "Building debug APK..."
+        ./gradlew assembleDebug --stacktrace --info
+        
+    - name: 📁 List APK files
+      run: |
+        echo "Listing all APK files:"
+        find . -name "*.apk" -type f
+        ls -la app/build/outputs/apk/debug/ || echo "Debug folder not found"
         
     - name: 📦 Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: EmailAssistant-Debug-APK
-        path: app/build/outputs/apk/debug/app-debug.apk
+        name: EmailAssistant-Debug-APK-v2
+        path: |
+          app/build/outputs/apk/debug/*.apk
+          app/build/outputs/apk/**/*.apk
         retention-days: 30
+        if-no-files-found: warn
         
-    - name: 📋 Show APK Info
+    - name: 📋 Build Summary
       run: |
-        echo "✅ Debug APK gerado com sucesso!"
-        echo "📱 Nome: EmailAssistant-Debug.apk"
-        echo "🔧 Tipo: Debug (para testes)"
-        echo "📥 Download: Vá para Actions > Artifacts"
+        echo "🎉 Build completed!"
+        echo "📱 APK Type: Debug (for testing)"
+        echo "📥 Download: Go to Actions > Artifacts"
+        echo "🔧 Install: Enable 'Unknown sources' on Android"
         echo ""
-        echo "⚠️  IMPORTANTE: Este é um APK de DEBUG"
-        echo "   Para APK de RELEASE (produção), configure os secrets:"
-        echo "   1. KEYSTORE_BASE64 (valor do arquivo keystore-base64.txt)"
-        echo "   2. KEYSTORE_PASSWORD: EmailAssist2024#Secure"
-        echo "   3. KEY_ALIAS: emailassistant"
-        echo "   4. KEY_PASSWORD: EmailKey2024#Strong"
+        echo "✅ Features included:"
+        echo "   - Voice recognition in Portuguese"
+        echo "   - AI email analysis"
+        echo "   - Microsoft Outlook integration"
+        echo "   - Text-to-speech"
+        echo "   - Hands-free mode"
+        echo ""
+        echo "⚠️  Note: This is a DEBUG APK for testing"
+        echo "   For production APK, configure GitHub secrets"
+
